@@ -1,0 +1,188 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'index.html'
+      - '.github/workflows/build.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Generate Android project
+        run: |
+          set -e
+          mkdir -p android/app/src/main/java/com/islamia/attendance android/app/src/main/assets
+          cp index.html android/app/src/main/assets/index.html
+          cd android
+          cat > settings.gradle.kts <<'EOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories { google(); mavenCentral() }
+          }
+          rootProject.name = "IslamiaAttendance"
+          include(":app")
+          EOF
+          cat > build.gradle.kts <<'EOF'
+          plugins {
+              id("com.android.application") version "8.5.2" apply false
+              id("org.jetbrains.kotlin.android") version "1.9.24" apply false
+          }
+          EOF
+          printf 'android.useAndroidX=true\norg.gradle.jvmargs=-Xmx2g\n' > gradle.properties
+          cat > app/build.gradle.kts <<'EOF'
+          plugins {
+              id("com.android.application")
+              id("org.jetbrains.kotlin.android")
+          }
+          android {
+              namespace = "com.islamia.attendance"
+              compileSdk = 34
+              defaultConfig {
+                  applicationId = "com.islamia.attendance"
+                  minSdk = 24
+                  targetSdk = 34
+                  versionCode = 1
+                  versionName = "1.0"
+              }
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+              kotlinOptions { jvmTarget = "17" }
+          }
+          dependencies {
+              implementation("androidx.activity:activity-ktx:1.9.2")
+              implementation("androidx.webkit:webkit:1.11.0")
+          }
+          EOF
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.CAMERA" />
+              <uses-feature android:name="android.hardware.camera" android:required="false" />
+              <application
+                  android:allowBackup="true"
+                  android:label="Islamia Attendance"
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+          cat > app/src/main/java/com/islamia/attendance/MainActivity.kt <<'EOF'
+          package com.islamia.attendance
+
+          import android.Manifest
+          import android.annotation.SuppressLint
+          import android.app.AlertDialog
+          import android.content.pm.PackageManager
+          import android.os.Bundle
+          import android.webkit.JsResult
+          import android.webkit.PermissionRequest
+          import android.webkit.WebChromeClient
+          import android.webkit.WebResourceRequest
+          import android.webkit.WebView
+          import android.webkit.WebViewClient
+          import androidx.activity.ComponentActivity
+          import androidx.activity.OnBackPressedCallback
+          import androidx.activity.result.contract.ActivityResultContracts
+          import androidx.webkit.WebViewAssetLoader
+
+          class MainActivity : ComponentActivity() {
+              private lateinit var web: WebView
+              private var pending: PermissionRequest? = null
+
+              private val camLauncher =
+                  registerForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
+                      pending?.let { if (ok) it.grant(it.resources) else it.deny() }
+                      pending = null
+                  }
+
+              @SuppressLint("SetJavaScriptEnabled")
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+                  val loader = WebViewAssetLoader.Builder()
+                      .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+                      .build()
+                  web = WebView(this)
+                  web.settings.javaScriptEnabled = true
+                  web.settings.domStorageEnabled = true
+                  web.settings.mediaPlaybackRequiresUserGesture = false
+                  web.webViewClient = object : WebViewClient() {
+                      override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) =
+                          loader.shouldInterceptRequest(request.url)
+                  }
+                  web.webChromeClient = object : WebChromeClient() {
+                      override fun onPermissionRequest(request: PermissionRequest) {
+                          runOnUiThread {
+                              if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                  request.grant(request.resources)
+                              } else {
+                                  pending = request
+                                  camLauncher.launch(Manifest.permission.CAMERA)
+                              }
+                          }
+                      }
+                      override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult): Boolean {
+                          AlertDialog.Builder(this@MainActivity)
+                              .setMessage(message)
+                              .setPositiveButton("OK") { _, _ -> result.confirm() }
+                              .setNegativeButton("Cancel") { _, _ -> result.cancel() }
+                              .setOnCancelListener { result.cancel() }
+                              .show()
+                          return true
+                      }
+                  }
+                  setContentView(web)
+                  web.loadUrl("https://appassets.androidplatform.net/assets/index.html")
+                  onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+                      override fun handleOnBackPressed() {
+                          if (web.canGoBack()) web.goBack() else finish()
+                      }
+                  })
+              }
+          }
+          EOF
+          cd app/src/main/assets
+          if curl -fsSL -o JsBarcode.all.min.js https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js && curl -fsSL -o html5-qrcode.min.js https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js; then
+            sed -i 's#https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/##; s#https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/##' index.html
+          fi
+
+      - name: Build APK
+        run: |
+          cd android
+          gradle assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../Islamia-Attendance.apk
+
+      - name: Publish APK to Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Islamia Attendance v${{ github.run_number }}
+          files: Islamia-Attendance.apk
