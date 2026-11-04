@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Islamia Model School Agarai – Attendance</title>
+<style>
+:root{--bg:#f2f6f3;--card:#fff;--tx:#14221b;--mut:#66756c;--line:#e0e8e2;--g:#0b6b45;--g2:#0f8a5a;--gold:#c9a227;--warn:#d97706;--soft:#e7f3ec;box-sizing:border-box;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1511;--card:#14201a;--tx:#ecf3ee;--mut:#93a69a;--line:#25362d;--g:#10a46b;--g2:#18c07f;--gold:#e3bd3c;--warn:#fbbf24;--soft:#183026;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0c1511;--card:#14201a;--tx:#ecf3ee;--mut:#93a69a;--line:#25362d;--g:#10a46b;--g2:#18c07f;--gold:#e3bd3c;--warn:#fbbf24;--soft:#183026;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(135deg,#075a3a,#0f8a5a);color:#fff;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 20px;border-radius:0 0 24px 24px}
+.hd{max-width:720px;margin:0 auto;display:flex;gap:12px;align-items:center}
+.crest{width:52px;height:52px;flex:none;border-radius:50%;background:#fff;display:grid;place-items:center}
+.hd h1{margin:0;font-size:17px;letter-spacing:.6px;line-height:1.15}
+.hd small{display:block;color:#f3d86b;font-weight:700;letter-spacing:3px;font-size:13px;margin-top:2px}
+.hd p{margin:4px 0 0;font-size:12px;opacity:.85}
+main{max-width:720px;margin:0 auto;padding:16px 16px calc(92px + env(safe-area-inset-bottom,0px))}
+.view{display:none}.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+h2{font-size:15px;margin:0 0 10px}
+.sub{color:var(--mut);font-size:13px}
+.hero{display:flex;gap:16px;align-items:center}
+.ring{position:relative;width:128px;height:128px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:26px}
+.ring b span{font-size:11px;color:var(--mut);font-weight:400;display:block;text-align:center;margin-top:-26px}
+.leg div{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px}
+.stat b{font-size:26px;display:block}.stat span{font-size:12px;color:var(--mut)}
+.bars{display:flex;gap:8px;align-items:flex-end;height:110px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px;font-size:11px;color:var(--mut)}
+.bar i{width:100%;max-width:34px;background:linear-gradient(var(--g2),var(--g));border-radius:6px 6px 2px 2px;min-height:3px}
+.ev{display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.ev:first-of-type{border-top:0}
+.tag{font-size:12px;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--g);font-weight:600;white-space:nowrap}
+.tag.late{background:#fdf1d6;color:#9a6700}.tag.out{background:#ece8fb;color:#5b3fc4}.tag.no{background:var(--bg);color:var(--mut)}
+.row{display:flex;gap:8px;margin-bottom:10px}
+input{flex:1;min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+button{font:inherit;border:0;border-radius:10px;padding:10px 14px;background:var(--g);color:#fff;cursor:pointer;font-weight:600}
+button.ghost{background:transparent;color:var(--mut);border:1px solid var(--line);font-weight:400}
+button:disabled{opacity:.35;cursor:default}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.name{font-weight:700}
+.times{font-size:13px;color:var(--mut);margin:4px 0 10px}
+.btns{display:flex;gap:8px}.btns button{flex:1}
+.outb{background:#6d4fd6}
+.x{background:none;color:var(--mut);padding:0 6px;font-size:20px;font-weight:400}
+#reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px}
+.toast{padding:11px 12px;border-radius:10px;margin:10px 0 0;color:#fff}.toast.ok{background:var(--g)}.toast.bad{background:var(--warn)}
+.empty{text-align:center;color:var(--mut);padding:20px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:10}
+nav div{display:flex;width:100%;max-width:720px}
+nav button{flex:1;background:none;color:var(--mut);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;font-weight:600}
+nav button.on{color:var(--g)}nav svg{width:24px;height:24px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal[hidden]{display:none}
+.mbox{background:var(--card);border-radius:16px;padding:16px;text-align:center;max-width:340px;width:100%}
+.mbox svg{max-width:100%;background:#fff;border-radius:8px;margin:10px 0}
+.idc{border:2px solid var(--g);border-radius:12px;padding:10px}
+.idc h3{margin:0;font-size:12px;color:var(--g);letter-spacing:.5px}
+@media print{header,main,nav{display:none}.modal{position:static;background:none}.mbox .btns{display:none}}
+</style>
+</head>
+<body>
+<header><div class="hd">
+  <div class="crest"><svg width="34" height="34" viewBox="0 0 40 40"><path d="M25 6a14 14 0 1 0 0 28 11 11 0 1 1 0-28z" fill="#0b6b45"/><path d="M30 14l1.8 3.8 4.2.5-3.1 2.9.8 4.1-3.7-2-3.7 2 .8-4.1-3.1-2.9 4.2-.5z" fill="#c9a227"/></svg></div>
+  <div><h1>ISLAMIA MODEL SCHOOL<small>AGARAI</small></h1><p>Student Attendance · Dashboard</p></div>
+</div></header>
+<main>
+<section class="view on" id="v-dash">
+  <div class="card"><div class="sub" id="date"></div><h2>Today’s attendance</h2>
+    <div class="hero">
+      <div class="ring"><svg width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="52" fill="none" stroke="var(--line)" stroke-width="14"/><circle id="aOk" cx="64" cy="64" r="52" fill="none" stroke="var(--g2)" stroke-width="14" stroke-dasharray="0 327"/><circle id="aLate" cx="64" cy="64" r="52" fill="none" stroke="var(--gold)" stroke-width="14" stroke-dasharray="0 327"/></svg><b><div id="pct">0%</div></b></div>
+      <div class="leg"><div><i class="dot" style="background:var(--g2)"></i>On time <b id="lOk">0</b></div><div><i class="dot" style="background:var(--gold)"></i>Late <b id="lLate">0</b></div><div><i class="dot" style="background:var(--line)"></i>Not in <b id="lNo">0</b></div></div>
+    </div></div>
+  <div class="grid">
+    <div class="stat"><b id="sTot">0</b><span>Enrolled</span></div>
+    <div class="stat"><b id="sIn">0</b><span>Present today</span></div>
+    <div class="stat"><b id="sIn2">0</b><span>Currently in school</span></div>
+    <div class="stat"><b id="sOut">0</b><span>Clocked out</span></div>
+  </div>
+  <div class="card"><h2>Last 7 days</h2><div class="bars" id="bars"></div></div>
+  <div class="card"><h2>Recent activity</h2><div id="evs"></div></div>
+  <div class="card"><h2>Settings</h2><div class="row" style="align-items:center;margin:0"><span class="sub">Late after</span><input id="cutoff" type="time" style="flex:0 0 120px"><button class="ghost" id="resetBtn" style="margin-left:auto">Reset today</button></div></div>
+</section>
+<section class="view" id="v-scan">
+  <div class="card"><div class="top"><h2 style="margin:0">Scan student barcode</h2><button id="scanBtn">Start camera</button></div>
+    <div id="reader"></div><div id="toast"></div>
+    <div class="row" style="margin:12px 0 0"><input id="manual" placeholder="Or type / scan code here"><button class="ghost" id="manualBtn">Go</button></div>
+    <p class="sub">First scan clocks in, second scan clocks out.</p></div>
+</section>
+<section class="view" id="v-stu">
+  <div class="card"><h2>Add student</h2><div class="row"><input id="newName" placeholder="Student name" maxlength="40"><input id="newCls" placeholder="Class" maxlength="12" style="flex:0 0 90px"></div><button id="addBtn" style="width:100%">Add student</button></div>
+  <div id="list"></div>
+</section>
+</main>
+<nav><div>
+  <button class="on" data-v="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</button>
+  <button data-v="scan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg>Scan</button>
+  <button data-v="stu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-4 3-6 6.500-6s6 2 6.500 6M16 5a3.500 3.500 0 0 1 0 7M18 14c2 .6 3.200 2.600 3.500 6"/></svg>Students</button>
+</div></nav>
+<div id="bcModal" class="modal" hidden><div class="mbox"><div class="idc"><h3>ISLAMIA MODEL SCHOOL AGARAI</h3><div class="name" id="bcName" style="margin-top:6px"></div><div class="sub" id="bcCls"></div><svg id="bcSvg"></svg><div class="sub" id="bcCode"></div></div><div class="btns" style="margin-top:12px"><button class="ghost" id="bcPrint">Print</button><button id="bcClose">Close</button></div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script>
+const KEY='attendance-v1',$=id=>document.getElementById(id);
+let S={students:[],log:{},cutoff:'08:30'};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const dk=o=>{const d=new Date();d.setDate(d.getDate()-(o||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const hm=t=>new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const day=()=>S.log[dk()]=S.log[dk()]||{};
+const rec=id=>day()[id]||{};
+function isLate(t){const d=new Date(t),[h,m]=S.cutoff.split(':').map(Number);return d.getHours()*60+d.getMinutes()>h*60+m}
+function clock(id,type){const r=day()[id]=day()[id]||{};if(type==='in'&&!r.in)r.in=Date.now();if(type==='out'&&r.in&&!r.out)r.out=Date.now();save();render()}
+function render(){
+  $('date').textContent=new Date().toLocaleDateString([],{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  $('cutoff').value=S.cutoff;
+  const T=S.students.length;let ok=0,late=0,out=0,evs=[];
+  S.students.forEach(s=>{const r=rec(s.id);if(r.in){isLate(r.in)?late++:ok++;evs.push({t:r.in,n:s.name,k:isLate(r.in)?'late':'in'});if(r.out){out++;evs.push({t:r.out,n:s.name,k:'out'})}}});
+  const p=ok+late,C=326.7,go=T?ok/T*C:0,gl=T?late/T*C:0;
+  $('aOk').setAttribute('stroke-dasharray',go+' '+C);
+  $('aLate').setAttribute('stroke-dasharray',gl+' '+C);$('aLate').setAttribute('stroke-dashoffset',-go);
+  $('pct').textContent=(T?Math.round(p/T*100):0)+'%';
+  $('lOk').textContent=ok;$('lLate').textContent=late;$('lNo').textContent=T-p;
+  $('sTot').textContent=T;$('sIn').textContent=p;$('sIn2').textContent=p-out;$('sOut').textContent=out;
+  let b='';for(let i=6;i>=0;i--){const l=S.log[dk(i)]||{},n=Object.values(l).filter(x=>x.in).length,h=T?Math.min(100,n/T*100):0;const d=new Date();d.setDate(d.getDate()-i);b+='<div class="bar"><span>'+n+'</span><i style="height:'+h+'%"></i><span>'+d.toLocaleDateString([],{weekday:'short'}).slice(0,2)+'</span></div>'}
+  $('bars').innerHTML=b;
+  evs.sort((a,c)=>c.t-a.t);
+  $('evs').innerHTML=evs.length?evs.slice(0,6).map(e=>'<div class="ev"><span>'+esc(e.n)+'</span><span><span class="tag '+(e.k==='in'?'':e.k)+'">'+(e.k==='out'?'Out':e.k==='late'?'Late in':'In')+'</span> '+hm(e.t)+'</span></div>').join(''):'<div class="empty">No activity yet today</div>';
+  $('list').innerHTML=T?S.students.map(s=>{
+    const r=rec(s.id);let g='<span class="tag no">Not in</span>';
+    if(r.in)g=r.out?'<span class="tag out">Clocked out</span>':isLate(r.in)?'<span class="tag late">Late</span>':'<span class="tag">In class</span>';
+    return '<div class="card"><div class="top"><div><div class="name">'+esc(s.name)+'</div><div class="sub">'+(s.cls?'Class '+esc(s.cls)+' · ':'')+s.id+'</div></div><span>'+g+'<button class="x" data-del="'+s.id+'" aria-label="Remove">×</button></span></div><div class="times">'+(r.in?'In '+hm(r.in)+(r.out?' · Out '+hm(r.out):''):'No activity today')+'</div><div class="btns"><button data-in="'+s.id+'"'+(r.in?' disabled':'')+'>Clock in</button><button class="outb" data-out="'+s.id+'"'+(!r.in||r.out?' disabled':'')+'>Clock out</button><button class="ghost" data-bc="'+s.id+'">Barcode</button></div></div>'}).join(''):'<div class="empty">No students yet. Add your first one above.</div>';
+}
+function show(v){if(v!=='scan')stopScan();document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));document.querySelectorAll('nav button').forEach(e=>e.classList.toggle('on',e.dataset.v===v));window.scrollTo(0,0)}
+document.querySelector('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(b.dataset.v)});
+$('list').addEventListener('click',e=>{const t=e.target;
+  if(t.dataset.in)clock(t.dataset.in,'in');else if(t.dataset.out)clock(t.dataset.out,'out');else if(t.dataset.bc)showBC(t.dataset.bc);
+  else if(t.dataset.del&&confirm('Remove this student?')){S.students=S.students.filter(s=>s.id!==t.dataset.del);save();render()}});
+function newId(){let c;do{c='S'+String(Math.floor(Math.random()*9e6)+1e6)}while(S.students.some(s=>s.id===c));return c}
+function add(){const n=$('newName').value.trim();if(!n)return;S.students.push({id:newId(),name:n,cls:$('newCls').value.trim()});$('newName').value='';$('newCls').value='';save();render()}
+$('addBtn').onclick=add;$('newName').addEventListener('keydown',e=>{if(e.key==='Enter')add()});
+$('cutoff').onchange=e=>{S.cutoff=e.target.value||'08:30';save();render()};
+$('resetBtn').onclick=()=>{if(confirm('Clear all of today’s clock-ins?')){delete S.log[dk()];save();render()}};
+function showBC(id){const s=S.students.find(x=>x.id===id);if(!s)return;$('bcName').textContent=s.name;$('bcCls').textContent=s.cls?'Class '+s.cls:'';$('bcCode').textContent=s.id;
+  try{JsBarcode('#bcSvg',s.id,{format:'CODE128',width:2,height:80,displayValue:false,margin:12,background:'#ffffff',lineColor:'#000000'})}catch(e){}
+  $('bcModal').hidden=false}
+$('bcClose').onclick=()=>{$('bcModal').hidden=true};$('bcPrint').onclick=()=>{try{window.print()}catch(e){}};
+let scanner=null,last='',lastT=0;
+function toast(m,k){$('toast').innerHTML='<div class="toast '+k+'">'+esc(m)+'</div>';clearTimeout(toast.h);toast.h=setTimeout(()=>{$('toast').innerHTML=''},4000)}
+function handleCode(c){c=String(c).trim();const n=Date.now();if(c===last&&n-lastT<3000)return;last=c;lastT=n;
+  const s=S.students.find(x=>x.id===c);if(!s){toast('Unknown barcode','bad');return}
+  const r=rec(s.id);
+  if(!r.in){clock(s.id,'in');toast(s.name+' clocked IN at '+hm(Date.now()),'ok')}
+  else if(!r.out){clock(s.id,'out');toast(s.name+' clocked OUT at '+hm(Date.now()),'ok')}
+  else toast(s.name+' already clocked out today','bad')}
+async function stopScan(){if(scanner){try{await scanner.stop();scanner.clear()}catch(e){}scanner=null}$('scanBtn').textContent='Start camera'}
+async function startScan(){
+  if(typeof Html5Qrcode==='undefined'){toast('Scanner library failed to load','bad');return}
+  try{scanner=new Html5Qrcode('reader',{formatsToSupport:[Html5QrcodeSupportedFormats.CODE_128],verbose:false});
+    await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:260,height:120}},handleCode,()=>{});$('scanBtn').textContent='Stop camera'}
+  catch(e){scanner=null;toast('Camera unavailable here. Use the text box instead.','bad')}}
+$('scanBtn').onclick=()=>scanner?stopScan():startScan();
+function manualGo(){const i=$('manual');if(i.value.trim()){handleCode(i.value);i.value=''}}
+$('manualBtn').onclick=manualGo;$('manual').addEventListener('keydown',e=>{if(e.key==='Enter'){last='';manualGo()}});
+render();
+</script>
+</body>
+</html>
