@@ -62,12 +62,33 @@ nav button.on{color:var(--g)}nav svg{width:24px;height:24px}
 .idc{border:2px solid var(--g);border-radius:12px;padding:10px}
 .idc h3{margin:0;font-size:12px;color:var(--g);letter-spacing:.5px}
 @media print{header,main,nav{display:none}.modal{position:static;background:none}.mbox .btns{display:none}}
+#auth{position:fixed;inset:0;background:linear-gradient(135deg,#075a3a,#0f8a5a);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+#auth[hidden]{display:none}
+.abox{background:var(--card);border-radius:20px;padding:22px;width:100%;max-width:360px;text-align:center}
+.abox h3{margin:0;font-size:13px;color:var(--g);letter-spacing:.6px}.abox h2{margin:14px 0 8px;font-size:18px}
+.abox input{width:100%;margin:6px 0;flex:none}.abox button{width:100%;margin-top:8px}
+#aMsg{color:#d33;font-size:13px;min-height:18px;margin-top:4px}
+.abox .link{background:none;color:var(--mut);font-weight:400;font-size:13px;text-decoration:underline}
+.lo{margin-left:auto;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);padding:8px 12px;font-size:13px}
+body.locked header,body.locked main,body.locked nav{display:none}
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="auth"><div class="abox">
+  <div class="crest" style="margin:0 auto 10px;background:var(--soft)"><svg width="34" height="34" viewBox="0 0 40 40"><path d="M25 6a14 14 0 1 0 0 28 11 11 0 1 1 0-28z" fill="#0b6b45"/><path d="M30 14l1.8 3.8 4.2.5-3.1 2.9.8 4.1-3.7-2-3.7 2 .8-4.1-3.1-2.9 4.2-.5z" fill="#c9a227"/></svg></div>
+  <h3>ISLAMIA MODEL SCHOOL AGARAI</h3><h2 id="authTitle"></h2>
+  <input id="aUser" placeholder="Username" autocomplete="username" autocapitalize="none">
+  <input id="aPass" type="password" placeholder="Password" autocomplete="current-password">
+  <input id="aNew" type="password" placeholder="New password" hidden>
+  <input id="aConf" type="password" placeholder="Confirm password" hidden>
+  <div id="aMsg"></div>
+  <button id="aGo">Sign in</button>
+  <button class="link" id="aCancel" hidden>Cancel</button>
+  <button class="link" id="aForgot">Forgot password? Reset app</button>
+</div></div>
 <header><div class="hd">
   <div class="crest"><svg width="34" height="34" viewBox="0 0 40 40"><path d="M25 6a14 14 0 1 0 0 28 11 11 0 1 1 0-28z" fill="#0b6b45"/><path d="M30 14l1.8 3.8 4.2.5-3.1 2.9.8 4.1-3.7-2-3.7 2 .8-4.1-3.1-2.9 4.2-.5z" fill="#c9a227"/></svg></div>
-  <div><h1>ISLAMIA MODEL SCHOOL<small>AGARAI</small></h1><p>Student Attendance · Dashboard</p></div>
+  <div><h1>ISLAMIA MODEL SCHOOL<small>AGARAI</small></h1><p>Student Attendance · Dashboard</p></div><button class="lo" id="logoutBtn">Log out</button>
 </div></header>
 <main>
 <section class="view on" id="v-dash">
@@ -84,7 +105,7 @@ nav button.on{color:var(--g)}nav svg{width:24px;height:24px}
   </div>
   <div class="card"><h2>Last 7 days</h2><div class="bars" id="bars"></div></div>
   <div class="card"><h2>Recent activity</h2><div id="evs"></div></div>
-  <div class="card"><h2>Settings</h2><div class="row" style="align-items:center;margin:0"><span class="sub">Late after</span><input id="cutoff" type="time" style="flex:0 0 120px"><button class="ghost" id="resetBtn" style="margin-left:auto">Reset today</button></div></div>
+  <div class="card"><h2>Settings</h2><div class="row" style="align-items:center;margin:0"><span class="sub">Late after</span><input id="cutoff" type="time" style="flex:0 0 120px"><button class="ghost" id="resetBtn" style="margin-left:auto">Reset today</button></div><div class="row" style="margin:10px 0 0"><button class="ghost" id="chgBtn" style="flex:1">Change password</button></div></div>
 </section>
 <section class="view" id="v-scan">
   <div class="card"><div class="top"><h2 style="margin:0">Scan student barcode</h2><button id="scanBtn">Start camera</button></div>
@@ -169,6 +190,48 @@ $('scanBtn').onclick=()=>scanner?stopScan():startScan();
 function manualGo(){const i=$('manual');if(i.value.trim()){handleCode(i.value);i.value=''}}
 $('manualBtn').onclick=manualGo;$('manual').addEventListener('keydown',e=>{if(e.key==='Enter'){last='';manualGo()}});
 render();
+const AK='attendance-auth',enc=new TextEncoder();
+const hex=u=>Array.from(u).map(x=>x.toString(16).padStart(2,'0')).join('');
+async function hash(p,salt){return hex(new Uint8Array(await crypto.subtle.digest('SHA-256',enc.encode(salt+':'+p))))}
+function getAuth(){try{return JSON.parse(localStorage.getItem(AK))}catch(e){return null}}
+async function setAuth(u,p){const salt=hex(crypto.getRandomValues(new Uint8Array(8)));try{localStorage.setItem(AK,JSON.stringify({u,salt,h:await hash(p,salt)}))}catch(e){}}
+let mode='login',fails=0,until=0;
+function unlock(){try{sessionStorage.setItem('att-ok','1')}catch(e){}document.body.classList.remove('locked');$('auth').hidden=true;show('dash');render()}
+function authUI(m){mode=m;const a=getAuth();
+  $('authTitle').textContent=m==='setup'?'Create admin account':m==='change'?'Change password':'Sign in';
+  $('aUser').value=m==='change'&&a?a.u:'';$('aUser').readOnly=m==='change';
+  $('aPass').value=$('aConf').value=$('aNew').value='';
+  $('aPass').placeholder=m==='change'?'Current password':'Password';
+  $('aConf').placeholder=m==='change'?'Confirm new password':'Confirm password';
+  $('aNew').hidden=m!=='change';$('aConf').hidden=m==='login';
+  $('aForgot').hidden=m!=='login';$('aCancel').hidden=m!=='change';
+  $('aGo').textContent=m==='setup'?'Create account':m==='change'?'Save password':'Sign in';
+  $('aMsg').textContent='';$('auth').hidden=false;document.body.classList.add('locked')}
+async function authGo(){
+  const msg=t=>{$('aMsg').textContent=t};
+  if(!(window.crypto&&crypto.subtle))return msg('Please open the app from its https link.');
+  const u=$('aUser').value.trim().toLowerCase(),p=$('aPass').value,a=getAuth();
+  if(mode==='setup'){
+    if(u.length<3)return msg('Username needs at least 3 characters.');
+    if(p.length<6)return msg('Password needs at least 6 characters.');
+    if(p!==$('aConf').value)return msg('Passwords do not match.');
+    await setAuth(u,p);return unlock()}
+  if(Date.now()<until)return msg('Too many attempts. Wait '+Math.ceil((until-Date.now())/1000)+' seconds.');
+  if(!a||u!==a.u||await hash(p,a.salt)!==a.h){if(++fails>=5){fails=0;until=Date.now()+30000}return msg('Wrong username or password.')}
+  fails=0;
+  if(mode==='change'){const n=$('aNew').value;
+    if(n.length<6)return msg('New password needs at least 6 characters.');
+    if(n!==$('aConf').value)return msg('New passwords do not match.');
+    await setAuth(a.u,n)}
+  unlock()}
+$('aGo').onclick=authGo;
+['aUser','aPass','aNew','aConf'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')authGo()}));
+$('aCancel').onclick=unlock;
+$('chgBtn').onclick=()=>{stopScan();authUI('change')};
+$('logoutBtn').onclick=()=>{try{sessionStorage.removeItem('att-ok')}catch(e){}stopScan();authUI('login')};
+$('aForgot').onclick=()=>{if(confirm('Reset the app? This erases all students, attendance records and the login on this phone.')){try{localStorage.removeItem(KEY);localStorage.removeItem(AK)}catch(e){}location.reload()}};
+(function(){const a=getAuth();let ok=false;try{ok=sessionStorage.getItem('att-ok')==='1'}catch(e){}
+  if(a&&ok)unlock();else authUI(a?'login':'setup')})();
 </script>
 </body>
 </html>
